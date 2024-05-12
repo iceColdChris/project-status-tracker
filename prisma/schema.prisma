@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,19 +7,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  username      String   @unique
-  passwordHash  String
-  userAuthToken String   @unique
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  role          Role     @relation(fields: [roleId], references: [id])
-  roleId        String   @db.ObjectId
+model AuthUser {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  email           String        @unique
+  hashed_password String
+  firstName       String
+  lastName        String
+  role            Role          @default(USER)
+  token           String?       @unique
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  auth_session    AuthSession[]
+
+  @@map("auth_user")
 }
 
-model Role {
-  id    String @id @default(auto()) @map("_id") @db.ObjectId
-  name  String @unique
-  users User[]
+model AuthSession {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  user_id        String   @db.ObjectId
+  active_expires BigInt
+  idle_expires   BigInt
+  auth_user      AuthUser @relation(references: [id], fields: [user_id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@map("auth_session")
+}
+
+enum Role {
+  USER
+  DEVELOPER
+  ADMIN
 }

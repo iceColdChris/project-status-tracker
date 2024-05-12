@@ -1,24 +1,30 @@
+import { lucia } from '$lib/server/lucia';
 import type { Handle } from '@sveltejs/kit';
-import prisma from '$lib/prisma';
 
 export const handle: Handle = async ({ event, resolve }) => {
-	const session = event.cookies.get('session');
+	const sessionId = event.cookies.get(lucia.sessionCookieName);
+	if (!sessionId) {
+		event.locals.user = null;
+		event.locals.session = null;
+		return resolve(event);
+	}
 
+	const { session, user } = await lucia.validateSession(sessionId);
+	if (session && session.fresh) {
+		const sessionCookie = lucia.createSessionCookie(session.id);
+		event.cookies.set(sessionCookie.name, sessionCookie.value, {
+			path: '.',
+			...sessionCookie.attributes
+		});
+	}
 	if (!session) {
-		return await resolve(event);
+		const sessionCookie = lucia.createBlankSessionCookie();
+		event.cookies.set(sessionCookie.name, sessionCookie.value, {
+			path: '.',
+			...sessionCookie.attributes
+		});
 	}
-
-	const user = await prisma.user.findUnique({
-		where: { userAuthToken: session },
-		select: { username: true, role: true }
-	});
-
-	if (user) {
-		event.locals.user = {
-			name: user.username,
-			role: user.role.name
-		};
-	}
-
-	return await resolve(event);
+	event.locals.user = user;
+	event.locals.session = session;
+	return resolve(event);
 };
