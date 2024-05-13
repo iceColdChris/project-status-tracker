@@ -15,7 +15,7 @@ const signUpSchema = userSchema.pick({
 });
 
 export const load = async (event) => {
-	if (event.locals.session) throw redirect(302, '/dashboard');
+	if (event.locals.session) throw redirect(302, '/');
 	const form = await superValidate(event, zod(signUpSchema));
 	return {
 		form
@@ -25,7 +25,6 @@ export const load = async (event) => {
 export const actions = {
 	default: async (event) => {
 		const form = await superValidate(event, zod(signUpSchema));
-		//console.log(form);
 
 		if (!form.valid) {
 			return fail(400, {
@@ -33,10 +32,10 @@ export const actions = {
 			});
 		}
 
+		let success = false;
+
 		//add user to db
 		try {
-			console.log('creating user');
-
 			const token = generateIdFromEntropySize(16);
 
 			const hashedPassword = await hash(form.data.password, {
@@ -47,7 +46,7 @@ export const actions = {
 			});
 
 			// create user
-			const user = await prisma.authUser.create({
+			const user = await prisma.user.create({
 				data: {
 					firstName: form.data.firstName,
 					lastName: form.data.lastName,
@@ -65,12 +64,16 @@ export const actions = {
 				...sessionCookie.attributes
 			});
 
-			return redirect(302, '/');
+			success = true;
 		} catch (e) {
 			console.error(e);
 			// email already in use
 			//might be other type of error but this is most common and this is how lucia docs sets the error to duplicate user
 			return setError(form, 'email', 'A user with that email already exists.');
+		}
+
+		if (success) {
+			redirect(302, '/');
 		}
 	}
 };

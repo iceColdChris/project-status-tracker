@@ -23,9 +23,7 @@ export const userSchema = z.object({
 	role: z
 		.enum(['USER', 'PREMIUM', 'ADMIN'], { required_error: 'You must have a role' })
 		.default('USER'),
-	verified: z.boolean().default(false),
 	token: z.string().optional(),
-	receiveEmail: z.boolean().default(true),
 	createdAt: z.date().optional(),
 	updatedAt: z.date().optional()
 });

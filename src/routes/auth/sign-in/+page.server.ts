@@ -12,7 +12,7 @@ const signInSchema = userSchema.pick({
 });
 
 export const load = async (event) => {
-	if (event.locals.session) throw redirect(302, '/dashboard');
+	if (event.locals.session) redirect(302, '/');
 	const form = await superValidate(event, zod(signInSchema));
 	return {
 		form
@@ -29,8 +29,10 @@ export const actions = {
 			});
 		}
 
+		let success = false;
+
 		try {
-			const existingUser = await prisma.authUser.findUnique({
+			const existingUser = await prisma.user.findUnique({
 				where: {
 					email: form.data.email
 				}
@@ -62,10 +64,14 @@ export const actions = {
 				...sessionCookie.attributes
 			});
 
-			return redirect(302, '/');
+			success = true;
 		} catch (e) {
 			console.error(e);
 			return setError(form, 'The email or password is incorrect.');
+		}
+
+		if (success) {
+			redirect(302, '/');
 		}
 	}
 };
