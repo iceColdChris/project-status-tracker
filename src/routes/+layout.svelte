@@ -17,6 +17,8 @@
 
 	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
 	import { storePopup } from '@skeletonlabs/skeleton';
+	import { onMount } from 'svelte';
+	import convertNameToInitials from '$lib/util/name-util';
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 
 	export let data;
@@ -27,6 +29,14 @@
 	function drawerOpen(): void {
 		drawerStore.open();
 	}
+
+	let initials = '';
+	onMount(() => {
+		if (data?.user?.firstName && data?.user?.lastName) {
+			initials = convertNameToInitials(data?.user?.firstName, data?.user?.lastName);
+		}
+	});
+	$: initials = initials;
 </script>
 
 <Toast position="tr" />
@@ -47,7 +57,7 @@
 				<strong class="text-xl uppercase">Project Status Tracker</strong>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
-				{#if data?.user}<Avatar width="w-10" background="bg-primary-500" />{/if}
+				{#if data?.user}<Avatar {initials} width="w-10" background="bg-primary-500" />{/if}
 				<LightSwitch />
 			</svelte:fragment>
 		</AppBar>
