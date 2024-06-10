@@ -48,6 +48,6 @@
 		"@lucia-auth/adapter-prisma": "^4.0.1",
 		"@node-rs/argon2": "^1.8.3",
 		"lucide-svelte": "^0.378.0",
-		"prisma": "^5.13.0"
+		"prisma": "^5.15.0"
 	}
 }
