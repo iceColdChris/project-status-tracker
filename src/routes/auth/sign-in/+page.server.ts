@@ -39,9 +39,7 @@ export const actions = {
 			});
 
 			if (!existingUser) {
-				return fail(400, {
-					message: 'Incorrect username or password'
-				});
+				return setError(form, 'email', 'User not found');
 			}
 
 			const validPassword = await verify(existingUser.hashed_password, form.data.password, {
@@ -52,9 +50,7 @@ export const actions = {
 			});
 
 			if (!validPassword) {
-				return fail(400, {
-					message: 'Incorrect username or password'
-				});
+				return setError(form, 'password', 'Incorrect username or password');
 			}
 
 			const session = await lucia.createSession(existingUser.id, {});
