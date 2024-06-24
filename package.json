@@ -12,7 +12,7 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
-		"@prisma/client": "^5.13.0",
+		"@prisma/client": "^5.15.1",
 		"@skeletonlabs/skeleton": "^2.10.0",
 		"@skeletonlabs/tw-plugin": "^0.4.0",
 		"@sveltejs/adapter-auto": "^3.2.0",
