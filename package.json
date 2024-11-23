@@ -44,7 +44,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@floating-ui/dom": "1.6.5",
+		"@floating-ui/dom": "1.6.12",
 		"@lucia-auth/adapter-prisma": "^4.0.1",
 		"@node-rs/argon2": "^1.8.3",
 		"lucide-svelte": "^0.378.0",
